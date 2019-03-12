@@ -1,0 +1,1 @@
+A directory with the exercises from the 'Introduction to Ruby, by Launch School' book.
