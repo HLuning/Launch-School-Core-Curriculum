@@ -2,12 +2,21 @@
 # ask the user for an operation to perform
 # perform the operation on the two numbers
 # output the result
+require 'yaml'
+MESSAGES = YAML.load_file('calculator_messages.yml')
+LANGUAGE = 'en'
+
+
 def prompt(message)
   Kernel.puts("=> #{message}")
 end
 
 def valid_number?(num)
-  num.to_i != 0
+  num.to_i.to_s == num
+end
+
+def access_msghsh(messagekey, language = 'nl')
+  MESSAGES[language][messagekey]
 end
 
 def operation_to_message(op)
@@ -23,13 +32,13 @@ def operation_to_message(op)
   end
 end
 
-prompt("Welcome to the calculator! Please enter your name:  ")
+prompt(access_msghsh('welcome'))
 
 name = ""
 loop do
   name = Kernel.gets().chomp()
   if name.empty?()
-    puts "that is not a valid entry. Please try again:  "
+    puts(MESSAGES["valid_name"])
   else
     break
   end
@@ -40,37 +49,28 @@ prompt("Hi #{name}!")
 loop do # main loop
   number1 = ''
   loop do
-    prompt("What's the first number?  ")
+    prompt(access_msghsh('ask_number1'))
     number1 = Kernel.gets().chomp()
     break if valid_number?(number1)
-    prompt("That is not a valid input.")
+    prompt(access_msghsh('invalid_num'))
   end
 
   number2 = ''
   loop do
-    prompt("What's the second number?  ")
+    prompt(access_msghsh('ask_number2'))
     number2 = Kernel.gets().chomp()
     break if valid_number?(number2)
-    prompt("That is not a valid input.")
+    prompt(access_msghsh('invalid_num'))
   end
 
-  operator_prompt = <<-MSG
-    What operation would you like to perform on these numbers?
-    1) add
-    2) subtract
-    3) multiply
-    4) divide
-
-  MSG
-
-  prompt(operator_prompt)
+  prompt(access_msghsh('operator_prompt'))
 
   operator = ''
 
   loop do
     operator = Kernel.gets().chomp()
     break if %w(1 2 3 4).include?(operator)
-    prompt "You must choose 1, 2, 3 or 4. Please try again:  "
+    prompt(access_msghsh('invalid_operator'))
   end
 
   prompt("#{operation_to_message(operator)} the two numbers...")

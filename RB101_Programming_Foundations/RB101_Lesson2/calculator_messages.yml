@@ -1,0 +1,29 @@
+en:
+  welcome: "Welcome to Calculator! Enter your name: "
+  valid_name: "Make sure to enter a valid name. "
+  ask_number1: "What's the first number? "
+  ask_number2: "what's the second number? "
+  invalid_num: "That's not a valid input. Please try again: "
+  operator_prompt: "
+    What operation would you like to perform on these numbers?\n
+    1) add\n
+    2) subtract\n
+    3) multiply\n
+    4) divide"
+
+  invalid_operator: "You must choose 1, 2, 3 or 4. Please try again: "
+
+nl: 
+  welcome: "Welkom bij de Rekenmachine! Vul hier je naam in: "
+  valid_name: "Vul a.u.b. een geldige naam in. "
+  ask_number1: "Het eerste getal: "
+  ask_number2: "Het tweede getal: "
+  invalid_num: "Dat is geen geldige invoer. Probeer het nog eens: "
+  operator_prompt: "
+    Wat voor berekening wil je maken?\n
+    1) optellen\n
+    2) aftrekken\n
+    3) vermenigvuldigen\n
+    4) delen"
+
+  invalid_operator: "Enkel 1, 2, 3 en 4 zijn geldige keuzes. Probeer opnieuw: "
