@@ -4,7 +4,9 @@
 # return that string
 
 def reverse_sentence(string)
-  string.split(" ").reverse.to_s
+  string.split(" ").reverse.join(" ")
 end
 
-p reverse_sentence("try this one")
+puts reverse_sentence('') == ''
+puts reverse_sentence('Hello World') == 'World Hello'
+puts reverse_sentence('Reverse these words') == 'words these Reverse'
