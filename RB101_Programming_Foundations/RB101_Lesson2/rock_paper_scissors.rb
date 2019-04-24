@@ -1,31 +1,80 @@
-VALID_CHOICES = ["rock", "paper", "scissors"]
+VALID_CHOICES = %w(rock paper scissors spock lizard)
 
-def display_results(player, computer)
-  if  (player == "rock" && computer == "scissors") ||
-      (player == "paper" && computer == "rock") ||
-      (player == "scissors" && computer == "paper")
-    prompt("You won!")
-  elsif
-      (player == "rock" && computer == "paper") ||
-      (player == "paper" && computer == "scissors") ||
-      (player == "scissors" && computer == "rock")
-    prompt("Computer won!")
-  else
-    prompt("It's a tie!")
-  end
-end
+WINNING_CONDITIONS = {
+  rock: [:lizard, :scissors],
+  paper: [:rock, :spock],
+  scissors: [:paper, :lizard],
+  spock: [:scissors, :rock],
+  lizard: [:paper, :spock]
+}
 
 def prompt(message)
   Kernel.puts("=> #{message}")
 end
 
+def convert_choice(user_input)
+  case user_input.downcase
+  when 'r'
+    'rock'
+  when 'p'
+    'paper'
+  when 'sc'
+    'scissors'
+  when 'sp'
+    'spock'
+  when 'l'
+    'lizard'
+  else
+    user_input
+  end
+end
+
+def win?(firstplayer, secondplayer)
+  WINNING_CONDITIONS[firstplayer.to_sym].include?(secondplayer.to_sym)
+end
+
+def determine_winner(player, computer)
+  if win?(player, computer)
+    'player'
+  elsif win?(computer, player)
+    'computer'
+  else
+    'none'
+  end
+end
+
+def display_results(winner)
+  case winner
+  when 'player'
+    prompt("You won!")
+  when 'computer'
+    prompt("The computer won!")
+  when 'none'
+    prompt("It's a tie!")
+end
+
+def increment_totalwins
+
+welcome_msg = <<-MSG
+You're playing rock-paper-scissors-spock-lizard against the computer.
+When either you or the computer reaches five wins,
+the game is over and the winning player becomes the grand winner.
+MSG
+
+prompt(welcome_msg)
+
 loop do
   choice = ""
   loop do
-    prompt("Choose one: #{VALID_CHOICES.join(", ")}: ")
-    choice = Kernel.gets().chomp()
+    choice_prompt_msg = <<-MSG
+    Choose one: #{VALID_CHOICES.join(', ')},
+    or type 'r'/ 'p'/ 'sc'/ 'sp'/ 'l': ")
+    MSG
 
-    if VALID_CHOICES.include?(choice.downcase)
+    prompt(choice_prompt_msg)
+    choice = convert_choice(Kernel.gets().chomp())
+
+    if VALID_CHOICES.include?(choice)
       break
     else
       prompt("That's not a valid choice.")
@@ -33,15 +82,19 @@ loop do
   end
 
   computer_choice = VALID_CHOICES.sample
-  
+
   prompt("You chose #{choice}, computer chose #{computer_choice}")
 
-  display_results(choice, computer_choice)
+  winner = determine_winner(choice, computer_choice)
 
-  prompt("do you want to play again?")
+  display_results(winner)
+
+  increment_totalwins(winner)
+
+  prompt("Do you want to play again?")
   answer = Kernel.gets().chomp()
   break unless answer.downcase().start_with?("y")
+
 end
 
 prompt("Thank you for playing!")
-
