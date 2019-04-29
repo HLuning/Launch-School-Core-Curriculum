@@ -1,18 +1,20 @@
-VALID_CHOICES = %w(rock paper scissors spock lizard)
+VALID_CHOICES = %w(rock paper scissors lizard spock)
 
-WINNING_CONDITIONS = {
-  rock: [:lizard, :scissors],
-  paper: [:rock, :spock],
+WINNING_COMBOS = {
+  rock:     [:lizard, :scissors],
+  paper:    [:rock, :spock],
   scissors: [:paper, :lizard],
-  spock: [:scissors, :rock],
-  lizard: [:paper, :spock]
+  lizard:   [:spock, :paper],
+  spock:    [:scissors, :rock]
 }
+
+WIN_SET = 5
 
 def prompt(message)
   Kernel.puts("=> #{message}")
 end
 
-def convert_choice(user_input)
+def convert_input(user_input)
   case user_input.downcase
   when 'r'
     'rock'
@@ -20,81 +22,112 @@ def convert_choice(user_input)
     'paper'
   when 'sc'
     'scissors'
-  when 'sp'
-    'spock'
   when 'l'
     'lizard'
+  when 'sp'
+    'spock'
   else
     user_input
   end
 end
 
-def win?(firstplayer, secondplayer)
-  WINNING_CONDITIONS[firstplayer.to_sym].include?(secondplayer.to_sym)
+def win?(player1_choice, player2_choice)
+  WINNING_COMBOS[player1_choice.to_sym].include?(player2_choice.to_sym)
 end
 
-def determine_winner(player, computer)
-  if win?(player, computer)
-    'player'
-  elsif win?(computer, player)
-    'computer'
-  else
-    'none'
+def round_winner(player1_choice, player2_choice)
+  if win?(player1_choice, player2_choice)
+    :you
+  elsif win?(player2_choice, player1_choice)
+    :computer
   end
 end
 
-def display_results(winner)
-  case winner
-  when 'player'
-    prompt("You won!")
-  when 'computer'
-    prompt("The computer won!")
-  when 'none'
+def display_round_winner(player1_choice, player2_choice)
+  case round_winner(player1_choice, player2_choice)
+  when :you
+    prompt("You are the winner of this round!")
+  when :computer
+    prompt("The computer won this round!")
+  else
     prompt("It's a tie!")
+  end
 end
 
-def increment_totalwins
+def increment_total(total_hash, player1_choice, player2_choice)
+  case round_winner(player1_choice, player2_choice)
+  when :you
+    total_hash[:you][0] += 1
+  when :computer
+    total_hash[:computer][0] += 1
+  end
+end
+
+def display_total(total_hash)
+  prompt("You have a total score of #{total_hash[:you][0]}.")
+  prompt("The computer has a total score of #{total_hash[:computer][0]}.")
+end
+
+def grandwinner?(total_hash)
+  if total_hash[:you][0] == WIN_SET
+    :you
+  elsif total_hash[:computer][0] == WIN_SET
+    :computer
+  end
+end
+
+def display_grandwinner(total_hash)
+  if grandwinner?(total_hash) == :you
+    prompt("You are the grand winner!")
+  elsif grandwinner?(total_hash) == :computer
+    prompt("The computer is the grand winner!")
+  end
+end
+
+choice = ""
+
+total_wins = {
+  you:      [0],
+  computer: [0]
+}
 
 welcome_msg = <<-MSG
-You're playing rock-paper-scissors-spock-lizard against the computer.
-When either you or the computer reaches five wins,
-the game is over and the winning player becomes the grand winner.
+"Welcome to rock-paper-scissors-lizard-spock! It's you against the computer.
+The first to win #{WIN_SET} rounds will be the grand winner."
 MSG
-
 prompt(welcome_msg)
 
 loop do
-  choice = ""
   loop do
-    choice_prompt_msg = <<-MSG
-    Choose one: #{VALID_CHOICES.join(', ')},
-    or type 'r'/ 'p'/ 'sc'/ 'sp'/ 'l': ")
-    MSG
+    prompt("Choose one: #{VALID_CHOICES.join(', ')}, ")
+    prompt("To indicate your choice, you can also type r / p / sc / l / sp . ")
+    choice = convert_input(Kernel.gets().chomp())
 
-    prompt(choice_prompt_msg)
-    choice = convert_choice(Kernel.gets().chomp())
+    break if VALID_CHOICES.include?(choice.downcase())
 
-    if VALID_CHOICES.include?(choice)
-      break
-    else
-      prompt("That's not a valid choice.")
-    end
+    prompt("That's not a valid choice, please try again.")
   end
 
-  computer_choice = VALID_CHOICES.sample
+  computer_choice = VALID_CHOICES.sample()
 
   prompt("You chose #{choice}, computer chose #{computer_choice}")
 
-  winner = determine_winner(choice, computer_choice)
+  display_round_winner(choice, computer_choice)
 
-  display_results(winner)
+  increment_total(total_wins, choice, computer_choice)
 
-  increment_totalwins(winner)
+  display_total(total_wins)
 
-  prompt("Do you want to play again?")
-  answer = Kernel.gets().chomp()
-  break unless answer.downcase().start_with?("y")
+  display_grandwinner(total_wins)
 
+  break if grandwinner?(total_wins)
+
+  prompt("Would you like to play again? y/n ")
+  play_again = Kernel.gets().chomp()
+
+  break if play_again.downcase.start_with?('n')
+
+  system('clear')
 end
 
-prompt("Thank you for playing!")
+prompt("Thank you for playing, bye!")
