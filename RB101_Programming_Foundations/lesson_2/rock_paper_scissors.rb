@@ -35,7 +35,7 @@ def win?(player1_choice, player2_choice)
   WINNING_COMBOS[player1_choice.to_sym].include?(player2_choice.to_sym)
 end
 
-def round_winner(player1_choice, player2_choice)
+def find_winner(player1_choice, player2_choice)
   if win?(player1_choice, player2_choice)
     :you
   elsif win?(player2_choice, player1_choice)
@@ -43,8 +43,8 @@ def round_winner(player1_choice, player2_choice)
   end
 end
 
-def display_round_winner(player1_choice, player2_choice)
-  case round_winner(player1_choice, player2_choice)
+def display_winner(winner)
+  case winner
   when :you
     prompt("You are the winner of this round!")
   when :computer
@@ -54,32 +54,32 @@ def display_round_winner(player1_choice, player2_choice)
   end
 end
 
-def increment_total(total_hash, player1_choice, player2_choice)
-  case round_winner(player1_choice, player2_choice)
+def increment_total(total_hash, winner)
+  case winner
   when :you
-    total_hash[:you][0] += 1
+    total_hash[:you] += 1
   when :computer
-    total_hash[:computer][0] += 1
+    total_hash[:computer] += 1
   end
 end
 
 def display_total(total_hash)
-  prompt("You have a total score of #{total_hash[:you][0]}.")
-  prompt("The computer has a total score of #{total_hash[:computer][0]}.")
+  prompt("You have a total score of #{total_hash[:you]}.")
+  prompt("The computer has a total score of #{total_hash[:computer]}.")
 end
 
-def grandwinner?(total_hash)
-  if total_hash[:you][0] == WIN_SET
+def find_grandwinner(total_hash)
+  if total_hash[:you] == WIN_SET
     :you
-  elsif total_hash[:computer][0] == WIN_SET
+  elsif total_hash[:computer] == WIN_SET
     :computer
   end
 end
 
-def display_grandwinner(total_hash)
-  if grandwinner?(total_hash) == :you
+def display_grandwinner(grandwinner)
+  if grandwinner == :you
     prompt("You are the grand winner!")
-  elsif grandwinner?(total_hash) == :computer
+  elsif grandwinner == :computer
     prompt("The computer is the grand winner!")
   end
 end
@@ -87,9 +87,11 @@ end
 choice = ""
 
 total_wins = {
-  you:      [0],
-  computer: [0]
+  you:      0,
+  computer: 0
 }
+
+system('clear')
 
 welcome_msg = <<-MSG
 "Welcome to rock-paper-scissors-lizard-spock! It's you against the computer.
@@ -99,7 +101,7 @@ prompt(welcome_msg)
 
 loop do
   loop do
-    prompt("Choose one: #{VALID_CHOICES.join(', ')}, ")
+    prompt("Choose one: #{VALID_CHOICES.join(', ')}. ")
     prompt("To indicate your choice, you can also type r / p / sc / l / sp . ")
     choice = convert_input(Kernel.gets().chomp())
 
@@ -112,20 +114,36 @@ loop do
 
   prompt("You chose #{choice}, computer chose #{computer_choice}")
 
-  display_round_winner(choice, computer_choice)
+  round_winner = find_winner(choice, computer_choice)
 
-  increment_total(total_wins, choice, computer_choice)
+  display_winner(round_winner)
+
+  increment_total(total_wins, round_winner)
 
   display_total(total_wins)
 
-  display_grandwinner(total_wins)
+  grandwinner = find_grandwinner(total_wins)
 
-  break if grandwinner?(total_wins)
+  display_grandwinner(grandwinner)
 
-  prompt("Would you like to play again? y/n ")
-  play_again = Kernel.gets().chomp()
+  break if grandwinner
 
-  break if play_again.downcase.start_with?('n')
+  play_again = ''
+
+  loop do
+    prompt("Would you like to play again? y/n ")
+    play_again = Kernel.gets().chomp()
+
+    if play_again.downcase.start_with?('n')
+      break
+    elsif play_again.downcase.start_with?('y')
+      break
+    else
+      prompt("That is not a valid choice. Please try again.")
+    end
+  end
+
+  break unless play_again.downcase.start_with?('y')
 
   system('clear')
 end
