@@ -131,12 +131,11 @@ loop do
   play_again = ''
 
   loop do
+    yes_or_no = %w(yes no n y)
     prompt("Would you like to play again? y/n ")
     play_again = Kernel.gets().chomp()
 
-    if play_again.downcase.start_with?('n')
-      break
-    elsif play_again.downcase.start_with?('y')
+    if yes_or_no.include?(play_again.downcase)
       break
     else
       prompt("That is not a valid choice. Please try again.")
