@@ -75,13 +75,13 @@ p frequencies
 
 words = "the flintstones rock"
 
-array = words.split(' ')
+def titlize(string)
+  modif_string = string.split(" ")
+  modif_string.map! { |word| word.capitalize!}
+  modif_string.join(' ')
+end
 
-array.map! {|word| word.capitalize! }
-
-words = array.join(' ')
-
-p words
+p titlize(words)
 
 
 # 10

@@ -1,0 +1,10 @@
+array_nums = []
+
+puts "Please enter the 1st number: "
+array_nums[0] = gets.to_i
+puts "Please enter the 1st number: "
+array_nums[1] = gets.to_i
+array_nums[2] = gets.to_i
+array_nums[3] = gets.to_i
+array_nums[4] = gets.to_i
+array_nums[5] = gets.to_i
