@@ -5,6 +5,4 @@ books = [
   {title: 'Ulysses', author: 'James Joyce', published: '1922'}
 ]
 
-p books.sort_by do |book|
-  book[:published].to_i
-end
+books.sort_by { |hash| hash[:published].to_i }
