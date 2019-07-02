@@ -1,9 +1,15 @@
+require 'pry'
+
+INITIAL_MARKER = ' '
+PLAYER_MARKER = 'X'
+COMPUTER_MARKER = 'O'
+
 def prompt(msg)
   puts "=> #{msg}"
 end
 
 def empty_squares(brd)
-  brd.keys.select{|key| brd[key] == ' '}
+  brd.keys.select{|key| brd[key] == INITIAL_MARKER}
 end
 
 def display_board(brd)
@@ -24,29 +30,65 @@ end
 
 def initialize_board
   new_board = {}
-  (1..9).each {|num| new_board[num] = ' '}
+  (1..9).each {|num| new_board[num] = INITIAL_MARKER}
   new_board
 end
 
 def player_places_piece!(brd)
   square = ''
   loop do
-    prompt("Choose a square (1-9) : ")
+    prompt("Choose a square (#{empty_squares(brd).join(', ')}) : ")
     square = gets.chomp.to_i
-    if empty_squares(brd).include?(square)
-      break
-    else
-      prompt("Sorry, that is not a valid choice. Please try again. ")
-    end
+    break if empty_squares(brd).include?(square)
+    prompt("Sorry, that is not a valid choice. Please try again. ")
   end
 
-  brd[square] = 'X'
+  brd[square] = PLAYER_MARKER
 end
+
+def computer_places_piece!(brd)
+  square = empty_squares(brd).sample
+  brd[square] = COMPUTER_MARKER
+end
+
+def board_full?(brd)
+  empty_squares(brd) == []
+end
+
+def someone_won?(brd)
+  !!detect_winner(brd)
+end
+
+def detect_winner(brd)
+  winning_lines = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
+                  [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
+                  [[1, 5, 9], [3, 5, 7]]
+  winning_lines.each do |line| 
+    if brd[line[0]] == PLAYER_MARKER &&
+      brd[line[1]] == PLAYER_MARKER &&
+      brd[line[2]] == PLAYER_MARKER
+      return "Player"
+    elsif brd[line[0]] == COMPUTER_MARKER &&
+      brd[line[1]] == COMPUTER_MARKER &&
+      brd[line[2]] == COMPUTER_MARKER
+      return "Computer"
+    end
+  end
+  nil
+end 
 
 board = initialize_board
 
-display_board(board)
+prompt("Welcome to tic-tac-toe. You are playing against the computer. Your marker is an 'X'.")
+system 'sleep 2'
 
-player_places_piece!(board)
+loop do
+  display_board(board)
+  player_places_piece!(board)
+  break if board_full?(board) || someone_won?(board)
+  computer_places_piece!(board)
+  break if board_full?(board) || someone_won?(board)
+  display_board(board)
+end
 
-display_board(board)
+prompt("#{detect_winner(board)} won the game!")
