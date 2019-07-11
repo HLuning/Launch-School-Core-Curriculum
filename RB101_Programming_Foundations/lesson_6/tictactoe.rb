@@ -7,6 +7,9 @@ WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
                 [[1, 5, 9], [3, 5, 7]]
 
+round_winner = ''
+total = {user: 0, computer: 0}
+
 def prompt(msg)
   puts "=> #{msg}"
 end
@@ -63,8 +66,21 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
+# def computer_places_piece!(brd)
+#   square = empty_squares(brd).sample
+#   brd[square] = COMPUTER_MARKER
+# end
+
 def computer_places_piece!(brd)
-  square = empty_squares(brd).sample
+  square = nil
+  WINNING_LINES.each do |line|
+    if brd.values_at(line[0], line[1], line[2]).count(PLAYER_MARKER) == 2
+      square = brd.slice(*line).key(INITIAL_MARKER)
+    end
+  end
+  if square == nil
+    square = empty_squares(brd).sample
+  end
   brd[square] = COMPUTER_MARKER
 end
 
@@ -78,13 +94,30 @@ end
 
 def detect_winner(brd)
   WINNING_LINES.each do |line|
-    if brd.values_at(*line).count(PLAYER_MARKER) == 3
+    if brd.values_at(line[0], line[1], line[2]).count(PLAYER_MARKER) == 3
       return 'Player'
     elsif brd.values_at(*line).count(COMPUTER_MARKER) == 3
       return 'Computer'
     end
   end
   nil
+end
+
+def update_total(rnd_winner, total_score)
+  case rnd_winner
+  when 'Player'
+    total_score[:user] += 1
+  when 'Computer'
+    total_score[:computer] += 1
+  end
+end
+
+def detect_grandwinner(total_score)
+  if total_score.has_value?(5)
+    true
+  else
+    false
+  end
 end
 
 loop do
@@ -105,10 +138,20 @@ loop do
   display_board(board)
 
   if someone_won?(board)
-    prompt("#{detect_winner(board)} won the game!")
+    round_winner = detect_winner(board)
+    update_total(round_winner, total)
+    prompt("#{round_winner} won the game!")
   else
     prompt("It's a tie!")
   end
+
+  if total[:user] == 5
+    prompt "You have won 5 games, you are the grand winner!"
+  elsif total[:computer] == 5
+    prompt "The computer has won 5 games and is the grand winner!"
+  end
+ 
+  break if detect_grandwinner(total)
 
   answer = ''
   loop do
@@ -120,3 +163,6 @@ loop do
 
   break if answer == 'n'
 end
+
+prompt "Thank you for playing, bye!"
+
