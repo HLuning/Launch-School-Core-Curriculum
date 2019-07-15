@@ -74,11 +74,17 @@ end
 def computer_places_piece!(brd)
   square = nil
   WINNING_LINES.each do |line|
-    if brd.values_at(line[0], line[1], line[2]).count(PLAYER_MARKER) == 2
-      square = brd.slice(*line).key(INITIAL_MARKER)
+    if (brd.values_at(line[0], line[1], line[2]).count(COMPUTER_MARKER) == 2) &&
+       (brd.values_at(line[0], line[1], line[2]).count(INITIAL_MARKER) == 1)
+      square = brd.slice(line[0], line[1], line[2]).key(INITIAL_MARKER)
+    elsif (brd.values_at(line[0], line[1], line[2]).count(PLAYER_MARKER) == 2) &&
+      (brd.values_at(line[0], line[1], line[2]).count(INITIAL_MARKER) == 1)
+      square = brd.slice(line[0], line[1], line[2]).key(INITIAL_MARKER)
     end
   end
-  if square == nil
+  if square == nil && empty_squares(brd).include?(5)
+    square = 5
+  elsif square == nil
     square = empty_squares(brd).sample
   end
   brd[square] = COMPUTER_MARKER
