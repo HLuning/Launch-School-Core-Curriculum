@@ -1,5 +1,5 @@
 require 'pry'
-
+FIRST_TURN = 'choose'
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
@@ -54,6 +54,19 @@ def initialize_board
   new_board
 end
 
+def choose_first_turn
+  choice = ''
+  loop do
+    prompt("Who should go first? Enter 'player' or 'computer':  ")
+    choice = gets.chomp
+    break if choice == 'player' || choice == 'computer'
+    prompt("That's not a valid choice, please try again.")
+  end
+  choice
+end
+
+
+
 def player_places_piece!(brd)
   square = ''
   loop do
@@ -89,6 +102,24 @@ def computer_places_piece!(brd)
   end
   brd[square] = COMPUTER_MARKER
 end
+
+def place_piece!(brd, crrnt_player)
+  if crrnt_player == 'computer'
+    computer_places_piece!(brd)
+  elsif crrnt_player == 'player'
+    player_places_piece!(brd)
+  end
+end
+
+def alternate_player(crrnt_player)
+  case crrnt_player
+    when 'player'
+      'computer'
+    when 'computer'
+      'player'
+  end
+end
+
 
 def board_full?(brd)
   empty_squares(brd) == []
@@ -126,19 +157,31 @@ def detect_grandwinner(total_score)
   end
 end
 
+system 'clear'
+prompt("Welcome to tic-tac-toe!")
+system 'sleep 2'
+
 loop do
   board = initialize_board
+  if FIRST_TURN == 'choose'
+    current_player = choose_first_turn
+  else
+    current_player = FIRST_TURN
+  end
 
-  system 'clear'
-  prompt("Welcome to tic-tac-toe!")
-  system 'sleep 2'
+  # loop do
+  #   display_board(board)
+  #   player_places_piece!(board)
+  #   break if board_full?(board) || someone_won?(board)
+  #   computer_places_piece!(board)
+  #   break if board_full?(board) || someone_won?(board)
+  # end
 
   loop do
     display_board(board)
-    player_places_piece!(board)
+    place_piece!(board, current_player)
     break if board_full?(board) || someone_won?(board)
-    computer_places_piece!(board)
-    break if board_full?(board) || someone_won?(board)
+    current_player = alternate_player(current_player)
   end
 
   display_board(board)
