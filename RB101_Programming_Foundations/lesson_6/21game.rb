@@ -4,9 +4,9 @@ end
 
 def join_and(array, delimiter1 = ', ', delimiter2 = 'and')
   if array.length > 2
-    string1 = array.first((array.length) - 1).join(delimiter1)
+    string1 = array.first(array.length - 1).join(delimiter1)
     string2 = array.pop.to_s
-    return string1 + "#{delimiter1}#{delimiter2} " + string2
+    string1 + "#{delimiter1}#{delimiter2} " + string2
   else
     array.join(" #{delimiter2} ")
   end
@@ -14,7 +14,7 @@ end
 
 def initialize_deck
   suits = ['hearts', 'spades', 'diamonds', 'clubs']
-  ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', ] +
+  ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10'] +
           ['jack', 'queen', 'king', 'ace']
   new_deck = []
   suits.each do |suit|
@@ -42,17 +42,13 @@ def calculate_value(hand)
     end
 
     if sum > 21
-      hand.each do |card|
-        if sum > 21 && card[1] == 'ace'
+      hand.each do |crd|
+        if sum > 21 && crd[1] == 'ace'
           sum -= 10
         end
       end
     end
-
-    sum
-
   end
-
   sum
 end
 
@@ -79,7 +75,7 @@ def busted?(hand)
 end
 
 def twenty_one?(hand)
-  hand_value =calculate_value(hand)
+  hand_value = calculate_value(hand)
   hand_value == 21
 end
 
@@ -88,23 +84,23 @@ def find_winner(plr_hand, dlr_hand)
   total_dealer = calculate_value(dlr_hand)
 
   if total_player == total_dealer
-    'tie'
+    :tie
   elsif total_player > total_dealer
-    'player'
+    :player
   else
-    'dealer'
+    :dealer
   end
 end
 
 def display_winner(plr_hand, dlr_hand)
   winner = find_winner(plr_hand, dlr_hand)
-  
+
   case winner
-  when 'tie'
+  when :tie
     prompt("It's a tie!")
-  when 'player'
+  when :player
     prompt("You won the game!")
-  when 'dealer'
+  when :dealer
     prompt("The dealer won the game!")
   end
 end
@@ -116,16 +112,13 @@ loop do
   dealer_hand = []
 
   # deal cards to player (2 cards) and to dealer (2 cards)
-  2.times {deal_cards(main_deck, player_hand)}
-  2.times {deal_cards(main_deck, dealer_hand)}
+  2.times { deal_cards(main_deck, player_hand) }
+  2.times { deal_cards(main_deck, dealer_hand) }
 
   # 'Welcome to game' prompt
   system 'clear'
   prompt("Welcome to 21!")
   system 'sleep 2'
-
-  total_player = calculate_value(player_hand)
-  total_dealer = calculate_value(dealer_hand)
 
   # loop to deal cards to player until busted or 'stay'
   loop do
@@ -156,7 +149,7 @@ loop do
     system 'sleep 2'
   else
     # deal cards to dealer until total_dealer >= 17 or 'busted'
-    loop do 
+    loop do
       display_dlrhand(dealer_hand)
       display_plrhand(player_hand)
       system 'sleep 2'
@@ -175,7 +168,7 @@ loop do
         break_dealer_loop = true
       elsif total_dealer >= 17
         prompt("Dealer chooses to stay")
-        system 'sleep 2' 
+        system 'sleep 2'
         prompt("")
         display_totals(player_hand, dealer_hand)
         display_winner(player_hand, dealer_hand)
@@ -197,7 +190,6 @@ loop do
   end
 
   break if play_again == 'no'
-
 end
 
 prompt("Thank you for playing, bye!")
